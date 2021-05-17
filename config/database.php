@@ -1,12 +1,13 @@
 <?php
 // used to connect to the database
 $host = "localhost";
-$db_name = "simplecrud";
+$db_name = "phpcrudapp";
 $username = "root";
 $password = "";
   
 try {
     $con = new PDO("mysql:host={$host};dbname={$db_name}", $username, $password);
+    
 }
   
 // show error

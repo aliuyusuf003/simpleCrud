@@ -1,127 +1,204 @@
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>PDO - Read Records</title>
-     
-    <!-- Latest compiled and minified Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
-         
-    <!-- custom css -->
-    <style>
-    .m-r-1em{ margin-right:1em; }
-    .m-b-1em{ margin-bottom:1em; }
-    .m-l-1em{ margin-left:1em; }
-    .mt0{ margin-top:0; }
-    </style>
- 
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>php crup app with bootstrap modal.</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
 </head>
 <body>
  
-    <!-- container -->
-    <div class="container">
-  
-        <div class="page-header">
-            <h1>Read Products</h1>
+
+
+<!-- Modal -->
+<div class="modal fade" id="studentAddModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Student Data</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="insert.php" method="POST">
+      <div class="modal-body">
+           
+                <div class="form-group">
+                  <label >First Name</label>
+                  <input type="text" name="fname" class="form-control" placeholder="Enter First Name">
+                  
+                </div>
+                <div class="form-group">
+                  <label >Last Name</label>
+                  <input type="text" name="lname" class="form-control" placeholder="Enter Last Name">
+                  
+                </div>
+                <div class="form-group">
+                  <label >Course</label>
+                  <input type="text" name="course" class="form-control" placeholder="Enter Course Name">
+                  
+                </div>
+                <div class="form-group">
+                  <label >Phone Number</label>
+                  <input type="text" name="contact" class="form-control" placeholder="Enter Phone Number">
+                  
+                </div>
+                
+            
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" name="insertData" class="btn btn-primary">Save changes</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ###################################################################################################################### -->
+<!-- Edit Modal -->
+<div class="modal fade" id="studentEditModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit Student Data</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="update.php" method="POST">
+      <div class="modal-body">
+            <input type="hidden" name="updateId" id="updateId">
+                <div class="form-group">
+                  <label >First Name</label>
+                  <input type="text" name="fname" id="fname" class="form-control" placeholder="Enter First Name">
+                  
+                </div>
+                <div class="form-group">
+                  <label >Last Name</label>
+                  <input type="text" name="lname" id="lname"  class="form-control" placeholder="Enter Last Name">
+                  
+                </div>
+                <div class="form-group">
+                  <label >Course</label>
+                  <input type="text" name="course" id="course"  class="form-control" placeholder="Enter Course Name">
+                  
+                </div>
+                <div class="form-group">
+                  <label >Phone Number</label>
+                  <input type="text" name="contact" id="contact"  class="form-control" placeholder="Enter Phone Number">
+                  
+                </div>
+                
+            
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" name="updateData" class="btn btn-primary">Update</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  <div class="container">
+    <div class="jumbotron">
+      <div class="card">
+        <h1>PHP MODAL APP</h1>
+      </div>
+      <div class="card">
+        <div class="card-body">
+        <!-- Button trigger modal -->
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#studentAddModal">
+            New Student
+          </button>
+
         </div>
-     
-        <?php
+      </div>
+
+
+      <div class="card">
+        <div class="card-body">
+        <table class="table table-dark">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">FIRST NAME</th>
+                <th scope="col">LAST NAME</th>
+                <th scope="col">COURSE</th>
+                <th scope="col">CONTACT</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+            <?php
 // include database connection
 include 'config/database.php';
- 
 
-
-$action = isset($_GET['action']) ? $_GET['action'] : "";
- 
-// if it was redirected from delete.php
-if($action=='deleted'){
-    echo "<div class='alert alert-success'>Record was deleted.</div>";
-}
- 
 // select all data
-$query = "SELECT id, name, description, price FROM products ORDER BY id DESC";
+$query = "SELECT id, firstname, lastname, course,contact FROM students ORDER BY id DESC";
 $stmt = $con->prepare($query);
 $stmt->execute();
- 
+
 // this is how to get number of rows returned
 $num = $stmt->rowCount();
- 
-// link to create record form
-echo "<a href='create.php' class='btn btn-primary m-b-1em'>Create New Product</a>";
- 
-//check if more than 0 record found
 if($num>0){
- 
-  echo "<table class='table table-hover table-responsive table-bordered'>";//start table
- 
-  //creating our table heading
-  echo "<tr>";
-      echo "<th>ID</th>";
-      echo "<th>Name</th>";
-      echo "<th>Description</th>";
-      echo "<th>Price</th>";
-      echo "<th>Action</th>";
-  echo "</tr>";
-   
- // retrieve our table contents
-// fetch() is faster than fetchAll()
-// http://stackoverflow.com/questions/2770630/pdofetchall-vs-pdofetch-in-a-loop
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-  // extract row
-  // this will make $row['firstname'] to
-  // just $firstname only
-  extract($row);
-   
-  // creating new table row per record
-  echo "<tr>";
-      echo "<td>{$id}</td>";
-      echo "<td>{$name}</td>";
-      echo "<td>{$description}</td>";
-      echo "<td>{$price}</td>";
-      echo "<td>";
-          // read one record 
-          echo "<a href='read_one.php?id={$id}' class='btn btn-info m-r-1em'>Read</a>";
-           
-          // we will use this links on next part of this post
-          echo "<a href='update.php?id={$id}' class='btn btn-primary m-r-1em'>Edit</a>";
 
-          // we will use this links on next part of this post
-          echo "<a href='#' onclick='delete_user({$id});'  class='btn btn-danger'>Delete</a>";
-      echo "</td>";
-  echo "</tr>";
-}
+  while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+    extract($row);
 
-// end table
-echo "</table>";
-
-     
-}
- 
-// if no records found
-else{
+  ?> 
+              <tr>
+               
+                <td><?php echo $id;?></td>
+                <td><?php echo $firstname;?></td>
+                <td><?php echo $lastname;?></td>
+                <td><?php echo $course;?></td>
+                <td><?php echo $contact;?></td>
+                <td><button type="button" class="btn btn-success editBtn">Edit</button></td>               
+              </tr>
+                
+  <?php     }?>
+    </tbody>
+    </table>
+  </div>
+</div>
+<?php
+  }else{
     echo "<div class='alert alert-danger'>No records found.</div>";
-}
-?>
-         
-    </div> <!-- end .container -->
-     
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-   
-<!-- Latest compiled and minified Bootstrap JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
- 
-<script type='text/javascript'>
-// confirm record deletion
-function delete_user( id ){
-     
-    var answer = confirm('Are you sure?');
-    if (answer){
-        // if user clicked ok, 
-        // pass the id to delete.php and execute the delete query
-        window.location = 'delete.php?id=' + id;
-    } 
-}
+  }
+  ?>
+    </div>
+  </div>
+  
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous"></script>
+
+<script>
+
+$(document).ready(function(){
+  $('.editBtn').on('click',function(){
+    $('#studentEditModal').modal('show');
+    row = $(this).closest('tr');
+    var data = row.children("td").map(function(){
+      return $(this).text();
+    }).get();
+
+    console.log(data);
+    $('#updateId').val(data[0]);
+    $('#fname').val(data[1]);
+    $('#lname').val(data[2]);
+    $('#course').val(data[3]);
+    $('#contact').val(data[4]);
+  });
+});
+
 </script>
- 
 </body>
 </html>
